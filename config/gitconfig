@@ -1,0 +1,70 @@
+[user]
+	name = Nikita Kamaev
+	email = hiyori.amatsuki@gmail.com
+
+[init]
+	defaultBranch = main
+
+[push]
+	default = current
+	autoSetupRemote = true
+
+[pull]
+	ff = only
+
+[fetch]
+	prune = true
+
+[rebase]
+	autostash = true
+
+[core]
+	ignorecase = false
+	quotepath = false
+	excludesFile = ~/.gitignore
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[advice]
+	skippedCherryPicks = false
+
+[color]
+	ui = true
+
+[alias]
+	st = status
+	df = diff
+	co = commit
+	br = branch
+	ps = push
+	pl = pull
+	ck = checkout
+	graph = log --pretty=format:'%Cgreen[%cd] %Cblue%h %Cred<%cn> %Creset%s' --date=short --decorate --graph --branches --tags --remotes
+	rc = rebase --continue
+	s = status -s
+	mend = commit --amend
+	alias = config --get-regexp "alias.*"
+
+[remote]
+	pushDefault = origin
+
+[ghq]
+	root = ~/ghq
+
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+
+[url "git@gitlab.com:"]
+	insteadOf = https://gitlab.com/
+
+[delta]
+	navigate = true
+	light = false
+
+[merge]
+	conflictstyle = diff3
+
+[diff]
+	colorMoved = default

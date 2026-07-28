@@ -1,0 +1,34 @@
+# CLI packages for `make apt` (one package per line; comments allowed)
+curl
+wget
+git
+make
+build-essential
+ca-certificates
+gnupg
+jq
+yq
+ripgrep
+fd-find
+fzf
+bat
+htop
+tree
+unzip
+zip
+tmux
+direnv
+gh
+# shell
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+# nicer CLIs (apt names; some also installed via cargo/mise later if missing)
+eza
+zoxide
+# editors / viewers
+vim
+# network
+httpie
+# fonts often useful for terminals
+fonts-firacode

@@ -114,9 +114,13 @@ pc-setup/
 - Steam launches at least one known game on Windows.
 - Linux `make` targets leave a usable developer environment.
 
-## Implementation order (next)
+## Implementation status
+
+Done in-repo:
 
 1. End-to-end playbook (`docs/playbook.md`) and P52s / dual-boot docs.
-2. Windows README + apps list; placeholder for WinUtil config.
+2. Windows README, apps list, and starter `windows/winutil-config.json`.
 3. Linux Makefile and scripts (`apt`, `zsh`, `git`, `mise`, `docker`, `cli`).
-4. Root README with the short path from wiped disk to done.
+4. Root README quickstart.
+
+Still on the machine: run the playbook, then re-export WinUtil config if you change selections.

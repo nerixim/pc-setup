@@ -1,18 +1,40 @@
 # pc-setup
 
-Automated dual-boot setup for a Lenovo ThinkPad P52s: **Windows 11** (games) + **Ubuntu 26.04 LTS** (dev / experiments).
+Dual-boot setup for a Lenovo ThinkPad P52s: **Windows 11** (games) + **Ubuntu 26.04 LTS** (dev / experiments).
 
 Sibling to [mac-setup](https://github.com/nerixim/mac-setup).
 
-## Status
+## Quick path
 
-Design is validated. Implementation (playbooks, WinUtil config, Linux `make` targets) comes next.
+1. Follow **[docs/playbook.md](docs/playbook.md)** (wipe → Windows 500 GB → WinUtil → Ubuntu + LUKS).
+2. On Ubuntu:
 
-See [docs/plans/2026-07-29-pc-setup-design.md](docs/plans/2026-07-29-pc-setup-design.md).
+```bash
+sudo apt update && sudo apt install -y git make
+git clone git@github.com:nerixim/pc-setup.git ~/pc-setup
+cd ~/pc-setup
+make apt zsh git mise docker cli
+```
 
-## Intended flow (summary)
+## Layout
 
-1. Wipe disk → Windows 11 on a 500 GB partition
-2. WinUtil with the saved config (debloat + Steam essentials)
-3. Ubuntu 26.04 on the remaining ~1.4 TB with LUKS
-4. `make apt zsh git mise docker cli` on Ubuntu
+| Path | Role |
+|---|---|
+| `docs/playbook.md` | End-to-end checklist |
+| `docs/dual-boot.md` | Partitioning / GRUB / recovery |
+| `docs/thinkpad-p52s.md` | Firmware and drivers |
+| `windows/` | WinUtil config + apps notes |
+| `Makefile` + `scripts/` | Ubuntu bootstrap (like `mac-setup`) |
+| `Aptfile` | apt package list |
+
+## Windows
+
+```powershell
+& ([ScriptBlock]::Create((irm "https://christitus.com/win"))) -Config "C:\path\to\pc-setup\windows\winutil-config.json" -Run
+```
+
+See [windows/README.md](windows/README.md).
+
+## Design
+
+[docs/plans/2026-07-29-pc-setup-design.md](docs/plans/2026-07-29-pc-setup-design.md)
