@@ -33,15 +33,9 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 
 ### 3. Add a boot menu entry
 
-1. If your Setup volume is not `S:`, edit `LETTER=S` at the top of `windows/add-setup-boot.bat`.
-2. Run the script **as Administrator** (Admin `cmd`):
-
-```bat
-cd /d D:\path\to\pc-setup\windows
-add-setup-boot.bat
-```
-
-Reboot → choose **Windows 11 Setup**.
+1. If your Setup volume is not `S:`, edit `$Letter = 'S'` at the top of `windows/add-setup-boot.ps1`.
+2. Right-click `windows/add-setup-boot.bat` → **Run as administrator** (window stays open; log is `windows/setup-boot.log`).
+3. Reboot → choose **Windows 11 Setup**.
 
 In the partition screen: delete the old `C:`, `D:`, `S:`, and any other partitions on the 2 TB disk. Create **one** 500 GB partition for Windows; leave the rest unallocated. Setup is already in RAM, so deleting `S:` here is expected.
 

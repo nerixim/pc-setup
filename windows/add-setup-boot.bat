@@ -1,50 +1,12 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
-
-rem Drive letter of the NTFS volume that holds the copied Windows ISO files (no colon).
-set "LETTER=S"
-
-if not exist "%LETTER%:\sources\boot.wim" (
-  echo Missing %LETTER%:\sources\boot.wim — copy the ISO contents to %LETTER%: first.
-  exit /b 1
-)
-if not exist "%LETTER%:\boot\boot.sdi" (
-  echo Missing %LETTER%:\boot\boot.sdi — copy the full ISO contents to %LETTER%: first.
-  exit /b 1
-)
-
-if exist "%~dp0setup-boot-id.txt" (
-  set /p OLDID=<"%~dp0setup-boot-id.txt"
-  bcdedit /delete !OLDID! /cleanup >nul 2>&1
-)
-
-bcdedit /create {ramdiskoptions} /d "Ramdisk options" >nul 2>&1
-bcdedit /set {ramdiskoptions} ramdisksdidevice partition=%LETTER%:
-bcdedit /set {ramdiskoptions} ramdisksdipath \boot\boot.sdi
+rem Launcher: keeps the window open so you can read errors.
+cd /d "%~dp0"
+net session >nul 2>&1
 if errorlevel 1 (
-  echo Failed to configure {ramdiskoptions}. Run from Admin Command Prompt.
+  echo Run this as Administrator: right-click add-setup-boot.bat -^> Run as administrator
+  pause
   exit /b 1
 )
-
-set "ID="
-for /f "tokens=2 delims={}" %%A in ('bcdedit /create /d "Windows 11 Setup" /application osloader') do set "ID={%%A}"
-if not defined ID (
-  echo Failed to create boot entry.
-  exit /b 1
-)
-
-echo Using boot entry %ID%
-echo %ID%>"%~dp0setup-boot-id.txt"
-
-bcdedit /set %ID% device ramdisk=[%LETTER%:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set %ID% osdevice ramdisk=[%LETTER%:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set %ID% path \Windows\System32\Boot\winload.efi
-bcdedit /set %ID% systemroot \Windows
-bcdedit /set %ID% detecthal Yes
-bcdedit /set %ID% winpe Yes
-bcdedit /displayorder %ID% /addlast
-bcdedit /timeout 10
-
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0add-setup-boot.ps1"
 echo.
-echo Done. Reboot and choose "Windows 11 Setup".
-endlocal
+pause
