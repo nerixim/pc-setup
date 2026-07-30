@@ -33,7 +33,7 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 
 ### 3. Add a boot menu entry
 
-Admin Command Prompt:
+Use **Admin Command Prompt** (`cmd.exe`), not PowerShell. In PowerShell, `{...}` is treated as a script block and breaks `bcdedit` (you may see `invalid command line switch: "/encodedCommand"`).
 
 ```bat
 bcdedit /create {ramdiskoptions} /d "Ramdisk options"
@@ -43,7 +43,7 @@ bcdedit /set {ramdiskoptions} ramdisksdipath \sources\boot.sdi
 bcdedit /copy {current} /d "Windows 11 Setup"
 ```
 
-Use the `{guid}` printed by the copy command:
+Use the `{guid}` printed by the copy command (paste it including the braces):
 
 ```bat
 bcdedit /set {guid} device ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
@@ -54,6 +54,7 @@ bcdedit /set {guid} winpe yes
 bcdedit /timeout 10
 ```
 
+If you must use PowerShell, quote every `{...}` token, e.g. `bcdedit /create '{ramdiskoptions}' /d "Ramdisk options"`.
 ### 4. Install
 
 Reboot → choose **Windows 11 Setup**.
