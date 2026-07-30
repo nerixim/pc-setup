@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 
 rem Drive letter of the NTFS volume that holds the copied Windows ISO files (no colon).
 set "LETTER=S"
@@ -8,16 +8,21 @@ if not exist "%LETTER%:\sources\boot.wim" (
   echo Missing %LETTER%:\sources\boot.wim — copy the ISO contents to %LETTER%: first.
   exit /b 1
 )
-if not exist "%LETTER%:\sources\boot.sdi" (
-  echo Missing %LETTER%:\sources\boot.sdi
+if not exist "%LETTER%:\boot\boot.sdi" (
+  echo Missing %LETTER%:\boot\boot.sdi — copy the full ISO contents to %LETTER%: first.
   exit /b 1
+)
+
+if exist "%~dp0setup-boot-id.txt" (
+  set /p OLDID=<"%~dp0setup-boot-id.txt"
+  bcdedit /delete !OLDID! /cleanup >nul 2>&1
 )
 
 bcdedit /create {ramdiskoptions} /d "Ramdisk options" >nul 2>&1
 bcdedit /set {ramdiskoptions} ramdisksdidevice partition=%LETTER%:
-bcdedit /set {ramdiskoptions} ramdisksdipath \sources\boot.sdi
+bcdedit /set {ramdiskoptions} ramdisksdipath \boot\boot.sdi
 if errorlevel 1 (
-  echo Failed to configure {ramdiskoptions}. Run this script from Admin Command Prompt.
+  echo Failed to configure {ramdiskoptions}. Run from Admin Command Prompt.
   exit /b 1
 )
 
@@ -29,13 +34,14 @@ if not defined ID (
 )
 
 echo Using boot entry %ID%
+echo %ID%>"%~dp0setup-boot-id.txt"
 
 bcdedit /set %ID% device ramdisk=[%LETTER%:]\sources\boot.wim,{ramdiskoptions}
 bcdedit /set %ID% osdevice ramdisk=[%LETTER%:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set %ID% path \windows\system32\boot\winload.efi
-bcdedit /set %ID% systemroot \windows
-bcdedit /set %ID% detecthal yes
-bcdedit /set %ID% winpe yes
+bcdedit /set %ID% path \Windows\System32\Boot\winload.efi
+bcdedit /set %ID% systemroot \Windows
+bcdedit /set %ID% detecthal Yes
+bcdedit /set %ID% winpe Yes
 bcdedit /displayorder %ID% /addlast
 bcdedit /timeout 10
 

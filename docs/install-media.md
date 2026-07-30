@@ -34,16 +34,12 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 ### 3. Add a boot menu entry
 
 1. If your Setup volume is not `S:`, edit `LETTER=S` at the top of `windows/add-setup-boot.bat`.
-2. Copy that script onto the PC (or run it from a cloned `pc-setup`).
-3. Right-click → **Run as administrator**, or from Admin `cmd`:
+2. Run the script **as Administrator** (Admin `cmd`):
 
 ```bat
 cd /d D:\path\to\pc-setup\windows
 add-setup-boot.bat
 ```
-
-The script sets `{ramdiskoptions}`, creates the loader entry, captures its id into `%ID%`, and applies all `/set` lines — no manual GUID paste.
-### 4. Install
 
 Reboot → choose **Windows 11 Setup**.
 
