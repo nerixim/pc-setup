@@ -47,8 +47,8 @@ Set Ubuntu as the first Boot Option in Lenovo BIOS if the machine skips GRUB.
 
 ## Reinstalling one side
 
-- **Windows only:** boot Windows USB → custom install → select the existing 500 GB NTFS partition (format it). Do not touch the LUKS partition. Repair GRUB from Ubuntu live USB afterward if needed.
-- **Ubuntu only:** installer → use the existing encrypted/free Linux space; keep the Windows partition. Reinstall GRUB.
+- **Windows only:** boot Setup again ([install-media.md](install-media.md)) → install onto the existing 500 GB NTFS partition (format it). Do not touch the LUKS partition. Repair GRUB from an Ubuntu live session afterward if needed.
+- **Ubuntu only:** boot the Ubuntu ISO the same way → use the existing Linux space; keep the Windows partition. Reinstall GRUB.
 
 ## Shared files later
 

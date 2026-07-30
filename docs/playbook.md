@@ -1,16 +1,14 @@
 # End-to-end playbook — ThinkPad P52s
 
-Follow this once on the machine. Details live in [dual-boot.md](dual-boot.md) and [thinkpad-p52s.md](thinkpad-p52s.md).
+Follow this once on the machine. Details: [install-media.md](install-media.md), [dual-boot.md](dual-boot.md), [thinkpad-p52s.md](thinkpad-p52s.md).
 
 ## Before you wipe
 
-- [ ] Copy anything you still need off `C:` / `D:` (and from Linux if you can mount it).
+- [ ] Copy anything you still need off `C:` / `D:`.
 - [ ] Note the LUKS passphrase you will choose (password manager / written offline).
-- [ ] On another machine (this Mac is fine), download:
-  - [Windows 11 ISO](https://www.microsoft.com/software-download/windows11)
-  - [Ubuntu 26.04 LTS Desktop ISO](https://ubuntu.com/download/desktop)
-- [ ] Create installer USBs — **[usb-from-mac.md](usb-from-mac.md)** (16 GB+ stick for Windows).
-- [ ] Optional: copy this repo onto a USB so WinUtil config and docs are offline.
+- [ ] Download the [Windows 11 ISO](https://www.microsoft.com/software-download/windows11) to a roomy drive (`D:`).
+- [ ] Prepare Windows Setup on a **temp internal volume** — [install-media.md](install-media.md) (preferred). USB is only a fallback.
+- [ ] Optional: copy this repo onto a stick or `D:` so WinUtil config is offline.
 
 ## 1. Firmware
 
@@ -19,79 +17,63 @@ Follow this once on the machine. Details live in [dual-boot.md](dual-boot.md) an
 - [ ] Storage controller: **AHCI** (not Intel RST / RAID).
 - [ ] Disable firmware **Fast Boot**.
 - [ ] Leave **Secure Boot** enabled for now; turn off only if an installer or driver fails.
-- [ ] Boot order: USB first for installs.
 
 ## 2. Windows 11 (500 GB only)
 
-- [ ] Boot the Windows USB.
-- [ ] At partitioning: **Delete all existing partitions** on the 2 TB disk.
-- [ ] Create a new partition of **500 GB** (≈ 512000 MB). Install Windows there.
-- [ ] Leave the remaining space **unallocated** — do not create a second Windows volume.
-- [ ] Finish OOBE with a **local account** if possible (WinUtil / Shift+F10 tricks also work).
-- [ ] Connect network; install Lenovo System Update or grab chipset + NVIDIA drivers from Lenovo / NVIDIA.
-- [ ] **Disable Fast Startup**: Control Panel → Power Options → Choose what the power buttons do → uncheck Fast startup. Or run WinUtil after.
+- [ ] Boot **Windows 11 Setup** from the temp volume (or USB fallback).
+- [ ] Delete all partitions on the 2 TB disk (including the temp Setup volume).
+- [ ] Create **one** 500 GB partition; install Windows there.
+- [ ] Leave the remaining space **unallocated**.
+- [ ] Finish OOBE with a **local account** if possible.
+- [ ] Install Lenovo / NVIDIA drivers.
+- [ ] **Disable Fast Startup**: Control Panel → Power Options → Choose what the power buttons do → uncheck Fast startup.
 
 ## 3. WinUtil (debloat + apps)
 
-Admin PowerShell:
+Admin PowerShell (config from this repo):
 
 ```powershell
-# Apply this repo's config (copy winutil-config.json onto the machine first)
 & ([ScriptBlock]::Create((irm "https://christitus.com/win"))) -Config "C:\path\to\pc-setup\windows\winutil-config.json" -Run
 ```
 
-If the config path is awkward on a fresh install, run the GUI once:
-
-```powershell
-irm "https://christitus.com/win" | iex
-```
-
-Then import `windows/winutil-config.json` (gear → Import), run Install + Tweaks, and re-export if you change anything.
-
-Checklist:
-
-- [ ] Standard-style tweaks applied (telemetry / consumer noise reduced).
-- [ ] Steam, Firefox, 7-Zip, PowerToys installed.
+- [ ] Tweaks applied; Steam, Firefox, 7-Zip, PowerToys installed.
 - [ ] Fast Startup off.
-- [ ] Steam signs in; download a small game later to verify GPU drivers.
-- [ ] Shut down fully (not hibernate) before the Ubuntu install.
+- [ ] Full shut down before Ubuntu (not hibernate).
 
 ## 4. Ubuntu 26.04 LTS (~1.4 TB, LUKS)
 
-- [ ] Boot the Ubuntu USB; install.
-- [ ] Choose **Install alongside Windows** *or* manual partitioning into the unallocated space.
-- [ ] Enable **disk encryption (LUKS)** for the Ubuntu system.
-- [ ] Let the installer install **GRUB** to the disk EFI (default).
-- [ ] After reboot: GRUB should list Ubuntu and Windows Boot Manager.
+- [ ] Download the [Ubuntu 26.04 LTS ISO](https://ubuntu.com/download/desktop) onto Windows (`C:\ISO\` or a small `T:` volume).
+- [ ] Boot the ISO via Grub2Win — [install-media.md](install-media.md) (USB fallback if needed).
+- [ ] Install into the unallocated space with **LUKS**.
+- [ ] Let the installer install **GRUB** (default).
+- [ ] After reboot: GRUB lists Ubuntu and Windows; Ubuntu is fine as default.
 
-If only Windows boots: BIOS boot order → Ubuntu / GRUB first. See [dual-boot.md](dual-boot.md).
+If only Windows boots: BIOS → Ubuntu / GRUB first. See [dual-boot.md](dual-boot.md).
 
 ## 5. Ubuntu bootstrap
 
 ```bash
 sudo apt update && sudo apt install -y git make
-git clone git@github.com:nerixim/pc-setup.git ~/pc-setup   # or HTTPS
+git clone git@github.com:nerixim/pc-setup.git ~/pc-setup
 cd ~/pc-setup
 make apt zsh git mise docker cli
 ```
 
-Then:
-
 - [ ] Log out/in (or reboot) so the `docker` group applies.
-- [ ] `mise install` if runtimes were not installed by the mise target.
-- [ ] Optional: Additional Drivers → proprietary NVIDIA if you want GPU compute on Linux.
+- [ ] `mise install` if needed.
+- [ ] Optional: Additional Drivers → proprietary NVIDIA.
 
 ## 6. Verify
 
-- [ ] Reboot → Ubuntu is default; Windows entry works.
-- [ ] Windows: Steam launches; a game runs.
-- [ ] Ubuntu: `git`, `mise`, `docker` work; shell feels usable.
+- [ ] GRUB: Ubuntu default; Windows entry works.
+- [ ] Windows: Steam launches.
+- [ ] Ubuntu: `git`, `mise`, `docker` usable.
 
 ## If something breaks
 
 | Problem | Fix |
 |---|---|
-| No GRUB | BIOS: Ubuntu first; or boot-repair from live USB |
+| No GRUB | BIOS: Ubuntu first; or boot-repair from Ubuntu live media |
 | Windows missing from GRUB | `sudo update-grub` from Ubuntu |
-| Ubuntu won't unlock | LUKS passphrase; live USB + cryptsetup if recovering |
-| Reinstall one OS | Leave the other partition alone; restore from this repo |
+| Ubuntu won't unlock | LUKS passphrase; live session + cryptsetup if recovering |
+| Reinstall one OS | Leave the other partition alone; use [install-media.md](install-media.md) again |

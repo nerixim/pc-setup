@@ -21,7 +21,7 @@ make apt zsh git mise docker cli
 | Path | Role |
 |---|---|
 | `docs/playbook.md` | End-to-end checklist |
-| `docs/usb-from-mac.md` | Make Windows + Ubuntu installer USBs |
+| `docs/install-media.md` | Boot Setup from HDD (preferred) or USB |
 | `docs/dual-boot.md` | Partitioning / GRUB / recovery |
 | `docs/thinkpad-p52s.md` | Firmware and drivers |
 | `windows/` | WinUtil config + apps notes |
