@@ -9,6 +9,8 @@ Thin Windows 11 on the **500 GB** partition. Full sequence: [../docs/playbook.md
 3. Install Lenovo + NVIDIA drivers before heavy Steam use.
 4. Disable **Fast Startup**: Control Panel → Power Options → Choose what the power buttons do → uncheck Fast startup.
 
+Before the wipe, boot Setup from a temp volume using `add-setup-boot.bat` — see [../docs/install-media.md](../docs/install-media.md).
+
 ## WinUtil
 
 Copy `winutil-config.json` onto the machine, then in **Admin PowerShell**:

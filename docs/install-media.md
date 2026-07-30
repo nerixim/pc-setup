@@ -33,59 +33,16 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 
 ### 3. Add a boot menu entry
 
-Use **Admin Command Prompt** (`cmd.exe`), not PowerShell. In PowerShell, `{...}` is treated as a script block and breaks `bcdedit`.
-
-**Check the files exist** (adjust `S:` if your letter differs):
-
-```bat
-dir S:\sources\boot.wim
-dir S:\sources\boot.sdi
-```
-
-**Ramdisk options** (safe to re-run if `{ramdiskoptions}` already exists):
+1. If your Setup volume is not `S:`, edit `LETTER=S` at the top of `windows/add-setup-boot.bat`.
+2. Copy that script onto the PC (or run it from a cloned `pc-setup`).
+3. Right-click → **Run as administrator**, or from Admin `cmd`:
 
 ```bat
-bcdedit /create {ramdiskoptions} /d "Ramdisk options"
-bcdedit /set {ramdiskoptions} ramdisksdidevice partition=S:
-bcdedit /set {ramdiskoptions} ramdisksdipath \sources\boot.sdi
+cd /d D:\path\to\pc-setup\windows
+add-setup-boot.bat
 ```
 
-**Create a new loader entry** (do **not** use `/copy {current}` — that copies a full Windows entry and often causes `element data type ... not recognized`):
-
-```bat
-bcdedit /create /d "Windows 11 Setup" /application osloader
-```
-
-You get a line like: `The entry was successfully created with identifier {a1b2c3d4-e5f6-7890-abcd-ef1234567890}`.
-
-Keep the **braces**. Leave `{ramdiskoptions}` as the literal word `ramdiskoptions` — do not replace that with your GUID.
-
-Example (use **your** identifier):
-
-```bat
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} device ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} osdevice ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} path \windows\system32\boot\winload.efi
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} systemroot \windows
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} detecthal yes
-bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} winpe yes
-bcdedit /displayorder {a1b2c3d4-e5f6-7890-abcd-ef1234567890} /addlast
-bcdedit /timeout 10
-```
-
-If an earlier `/copy {current}` entry is broken, remove it then create a fresh one:
-
-```bat
-bcdedit /delete {paste-old-guid-here} /cleanup
-```
-
-Verify:
-
-```bat
-bcdedit /enum all
-```
-
-You should see **Windows 11 Setup** with `device` / `osdevice` pointing at `ramdisk=[S:]\sources\boot.wim,...`, and a **Ramdisk options** section with `partition=S:`.
+The script sets `{ramdiskoptions}`, creates the loader entry, captures its id into `%ID%`, and applies all `/set` lines — no manual GUID paste.
 ### 4. Install
 
 Reboot → choose **Windows 11 Setup**.
