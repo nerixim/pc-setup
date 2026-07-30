@@ -12,7 +12,7 @@ UEFI dual-boot is least painful when Windows owns the first install and Ubuntuâ€
 | Windows | 500 GB | NTFS |
 | Ubuntu | ~1.4 TB | ext4 inside LUKS |
 
-Windows setup UI: after wiping the disk, create **one** 500 GB partition and install. Leave free space alone.
+Windows setup UI: delete old OS/data partitions on the target disk, **keep** the Setup media volume if you are installing from an internal copy of the ISO, create **one** 500 GB Windows partition from unallocated space, install there. Delete the media volume only after the new Windows has booted. Leave free space for Ubuntu.
 
 Ubuntu installer:
 

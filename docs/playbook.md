@@ -21,9 +21,10 @@ Follow this once on the machine. Details: [install-media.md](install-media.md), 
 ## 2. Windows 11 (500 GB only)
 
 - [ ] Boot **Windows 11 Setup** from the temp volume (or USB fallback).
-- [ ] Delete all partitions on the 2 TB disk (including the temp Setup volume).
-- [ ] Create **one** 500 GB partition; install Windows there.
-- [ ] Leave the remaining space **unallocated**.
+- [ ] On Disk 0: delete old OS/data partitions only — **keep** the Setup media volume until install completes.
+- [ ] Create **one** 500 GB partition from unallocated; install Windows there.
+- [ ] Leave the remaining space **unallocated** (plus the small Setup volume until after first boot).
+- [ ] After OOBE: delete the Setup media volume in Disk Management.
 - [ ] Finish OOBE with a **local account** if possible.
 - [ ] Install Lenovo / NVIDIA drivers.
 - [ ] **Disable Fast Startup**: Control Panel → Power Options → Choose what the power buttons do → uncheck Fast startup.

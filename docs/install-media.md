@@ -37,9 +37,18 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 2. Right-click `windows/add-setup-boot.bat` → **Run as administrator** (window stays open; log is `windows/setup-boot.log`).
 3. Reboot → choose **Windows 11 Setup**.
 
-In the partition screen: delete the old `C:`, `D:`, `S:`, and any other partitions on the 2 TB disk. Create **one** 500 GB partition for Windows; leave the rest unallocated. Setup is already in RAM, so deleting `S:` here is expected.
+### 4. Partitioning (Disk 0 = 2 TB target)
 
-Continue with [playbook.md](playbook.md) (OOBE → WinUtil → Ubuntu).
+Keep the **Setup media volume** until install finishes — Setup still reads `install.wim` from it (not only from RAM).
+
+On **Disk 0** only:
+
+1. Delete old OS/data partitions you do not need (former `C:` / `D:`, etc.).
+2. **Do not delete** the ~20 GB volume that holds the copied ISO (labeled like “Windows 11 Setup” / whatever letter you used).
+3. Select **Unallocated** → **New** → **512000** MB (500 GB) → Apply (EFI/MSR may appear — normal).
+4. Select that new 500 GB **Primary** → **Next**.
+
+Leave **Disk 1** alone if it still has a working Windows you might need. After the new Windows boots, delete the old Setup media volume from Disk Management.
 
 ---
 
