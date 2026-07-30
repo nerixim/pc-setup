@@ -33,28 +33,59 @@ You cannot *extend* `C:` into this space while `D:` sits in between; you *can* s
 
 ### 3. Add a boot menu entry
 
-Use **Admin Command Prompt** (`cmd.exe`), not PowerShell. In PowerShell, `{...}` is treated as a script block and breaks `bcdedit` (you may see `invalid command line switch: "/encodedCommand"`).
+Use **Admin Command Prompt** (`cmd.exe`), not PowerShell. In PowerShell, `{...}` is treated as a script block and breaks `bcdedit`.
+
+**Check the files exist** (adjust `S:` if your letter differs):
+
+```bat
+dir S:\sources\boot.wim
+dir S:\sources\boot.sdi
+```
+
+**Ramdisk options** (safe to re-run if `{ramdiskoptions}` already exists):
 
 ```bat
 bcdedit /create {ramdiskoptions} /d "Ramdisk options"
 bcdedit /set {ramdiskoptions} ramdisksdidevice partition=S:
 bcdedit /set {ramdiskoptions} ramdisksdipath \sources\boot.sdi
-
-bcdedit /copy {current} /d "Windows 11 Setup"
 ```
 
-Use the `{guid}` printed by the copy command (paste it including the braces):
+**Create a new loader entry** (do **not** use `/copy {current}` — that copies a full Windows entry and often causes `element data type ... not recognized`):
 
 ```bat
-bcdedit /set {guid} device ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set {guid} osdevice ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
-bcdedit /set {guid} path \windows\system32\boot\winload.efi
-bcdedit /set {guid} systemroot \windows
-bcdedit /set {guid} winpe yes
+bcdedit /create /d "Windows 11 Setup" /application osloader
+```
+
+You get a line like: `The entry was successfully created with identifier {a1b2c3d4-e5f6-7890-abcd-ef1234567890}`.
+
+Keep the **braces**. Leave `{ramdiskoptions}` as the literal word `ramdiskoptions` — do not replace that with your GUID.
+
+Example (use **your** identifier):
+
+```bat
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} device ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} osdevice ramdisk=[S:]\sources\boot.wim,{ramdiskoptions}
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} path \windows\system32\boot\winload.efi
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} systemroot \windows
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} detecthal yes
+bcdedit /set {a1b2c3d4-e5f6-7890-abcd-ef1234567890} winpe yes
+bcdedit /displayorder {a1b2c3d4-e5f6-7890-abcd-ef1234567890} /addlast
 bcdedit /timeout 10
 ```
 
-If you must use PowerShell, quote every `{...}` token, e.g. `bcdedit /create '{ramdiskoptions}' /d "Ramdisk options"`.
+If an earlier `/copy {current}` entry is broken, remove it then create a fresh one:
+
+```bat
+bcdedit /delete {paste-old-guid-here} /cleanup
+```
+
+Verify:
+
+```bat
+bcdedit /enum all
+```
+
+You should see **Windows 11 Setup** with `device` / `osdevice` pointing at `ramdisk=[S:]\sources\boot.wim,...`, and a **Ramdisk options** section with `partition=S:`.
 ### 4. Install
 
 Reboot → choose **Windows 11 Setup**.
