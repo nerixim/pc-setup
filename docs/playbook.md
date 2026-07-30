@@ -9,7 +9,9 @@ Follow this once on the machine. Details live in [dual-boot.md](dual-boot.md) an
 - [ ] On another machine (this Mac is fine), download:
   - [Windows 11 ISO](https://www.microsoft.com/software-download/windows11)
   - [Ubuntu 26.04 LTS Desktop ISO](https://ubuntu.com/download/desktop)
-  - Rufus (Windows) or balenaEtcher / `dd` to write USBs
+- [ ] Create installer USBs — see **[usb-from-mac.md](usb-from-mac.md)**.
+  - **Do not `dd` a Windows ISO** on macOS (it will not boot). Use wimlib + FAT32, or Rufus on the existing Windows install.
+  - Ubuntu ISOs **can** be written with `dd`.
 - [ ] Optional: clone this repo onto a USB stick so WinUtil config and docs are offline.
 
 ## 1. Firmware
