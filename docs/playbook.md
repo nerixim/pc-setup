@@ -24,10 +24,53 @@ Follow this once on the machine. Details: [install-media.md](install-media.md), 
 - [ ] On Disk 0: delete old OS/data partitions only — **keep** the Setup media volume until install completes.
 - [ ] Create **one** 500 GB partition from unallocated; install Windows there.
 - [ ] Leave the remaining space **unallocated** (plus the small Setup volume until after first boot).
-- [ ] After OOBE: delete the Setup media volume in Disk Management.
+- [ ] After OOBE: clean leftover partitions and old boot entries (below).
 - [ ] Finish OOBE with a **local account** if possible.
 - [ ] Install Lenovo / NVIDIA drivers.
 - [ ] **Disable Fast Startup**: Control Panel → Power Options → Choose what the power buttons do → uncheck Fast startup.
+
+### After first boot — partitions & old Linux/Pop!_OS leftovers
+
+Identify disks by **size** (your ~2 TB install disk vs the small recovery disk).
+
+**Disk Management**
+
+1. Delete the **Setup media** volume (old `D:` / ISO copy) on the big disk — only after this Windows has booted successfully.
+2. On the **small** disk: delete Recovery / OEM junk if you do not need Lenovo recovery. Or wipe the whole small disk: Admin `cmd` → `diskpart` → `list disk` → `select disk N` → `clean` → `exit`, then create one new NTFS volume if you want extra storage.
+3. Leave the large **unallocated** region on the big disk for Ubuntu. Do not create a Windows volume that fills the disk.
+
+**Old Pop!_OS / Linux boot entries (EFI)**
+
+1. Admin `cmd`:
+
+```bat
+mountvol S: /S
+dir S:\EFI
+```
+
+2. If you see folders like `Pop_OS`, `ubuntu`, `debian`, `Boot` leftovers from Linux (not `Microsoft` / `Boot` you still need):
+
+```bat
+rmdir /S /Q S:\EFI\Pop_OS
+rmdir /S /Q S:\EFI\ubuntu
+```
+
+(Use the actual folder names from `dir`. Do **not** delete `S:\EFI\Microsoft`.)
+
+3. `mountvol S: /D` when finished.
+
+4. Firmware boot menu clutter: reboot → **F1** → Boot (or Startup) → remove stale **Pop!_OS** / **ubuntu** entries if listed. Or after Ubuntu is installed later, `efibootmgr -v` and delete old numbers.
+
+5. Windows boot menu clutter (old “Windows 11 Setup” entries):
+
+```bat
+bcdedit /enum firmware
+bcdedit /enum all
+```
+
+Delete only entries you recognize as Setup/ramdisk leftovers, e.g. `bcdedit /delete {guid} /cleanup`.
+
+Then continue with WinUtil (§3) and Ubuntu (§4).
 
 ## 3. WinUtil (debloat + apps)
 
